@@ -45,17 +45,17 @@ namespace RaiTask.API.Controllers
             return await _service.AddScheduleJobAsync(entity);
         }
 
-        /// <summary>
-        /// 添加任务
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        [HttpPost("enable")]
-        public async Task<IResponseOutput> enable()
-        {
-            await _service.StartScheduleAsync();
-            return ResponseOutput.Ok();
-        }
+        ///// <summary>
+        ///// 添加任务
+        ///// </summary>
+        ///// <param name="entity"></param>
+        ///// <returns></returns>
+        //[HttpPost("enable")]
+        //public async Task<IResponseOutput> enable()
+        //{
+        //    await _service.StartScheduleAsync();
+        //    return ResponseOutput.Ok();
+        //}
 
 
         /// <summary>

@@ -38,8 +38,15 @@ namespace RaiTask.Common.Job
         /// </summary>
         private string driverDelegateType;
 
-        public JobCenter()
+
+        /// <summary>
+        /// 调度器
+        /// </summary>
+        private static  IScheduler scheduler;
+
+        public  JobCenter()
         {
+            StartScheduleAsync();
             InitDriverDelegateType();
             dbProvider = new DbProvider(Configs.AppSettings.Quartz.DbProviderName, Configs.AppSettings.Quartz.ConnectionString);
         }
@@ -93,10 +100,6 @@ namespace RaiTask.Common.Job
             }
         }
 
-        /// <summary>
-        /// 调度器
-        /// </summary>
-        private static IScheduler scheduler;
 
         /// <summary>
         /// 初始化Scheduler

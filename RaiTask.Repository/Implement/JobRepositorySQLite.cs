@@ -49,7 +49,7 @@ namespace RaiTask.Repository.Implement
                 //初始化 建表
                 if (count == 0)
                 {
-                    string init_sql = await File.ReadAllTextAsync("Tables/tables_sqlite.sql");
+                    string init_sql = await File.ReadAllTextAsync("Files/Tables/tables_sqlite.sql");
                     return await connection.ExecuteAsync(init_sql);
                 }
             }

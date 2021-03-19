@@ -97,7 +97,13 @@ namespace RaiTask.API.Common
 
             //DI自动注册仓储、服务
             AddAssembly(services, "RaiTask.Services");
+
+            #region JOb
+
             services.TryAddSingleton<IJobCenter, JobCenter>();
+            services.AddHostedService<HostedService>();
+            #endregion
+
             //AddAssembly(services, "RaiTask.Repository");
             //services.AddScoped(typeof(ILogger), typeof(Logger));
 
