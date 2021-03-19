@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>RaiTask.IServices.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="RaiTask.IServices.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RaiTask.Common\RaiTask.Common.csproj" />
+    <ProjectReference Include="..\RaiTask.Repository\RaiTask.Repository.csproj" />
+  </ItemGroup>
+
+</Project>

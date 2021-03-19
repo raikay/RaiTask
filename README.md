@@ -1,2 +1,1 @@
-# RaiTask
-.Net Core 任务调度系统
+.Net Core 权限管理系统
