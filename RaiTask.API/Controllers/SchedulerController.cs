@@ -163,10 +163,10 @@ namespace RaiTask.API.Controllers
         /// 获取所有任务
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetAllJob")]
-        public async Task<List<JobInfoEntity>> GetAllJob()
+        [HttpGet("Jobs")]
+        public  Task<IResponseOutput> GetAllJob()
         {
-            return await _service.GetAllJobAsync();
+            return  _service.GetAllJobAsync();
         }
 
         /// <summary>

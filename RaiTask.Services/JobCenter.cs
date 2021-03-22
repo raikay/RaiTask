@@ -42,9 +42,9 @@ namespace RaiTask.Common.Job
         /// <summary>
         /// 调度器
         /// </summary>
-        private static  IScheduler scheduler;
+        private static IScheduler scheduler;
 
-        public  JobCenter()
+        public JobCenter()
         {
             StartScheduleAsync();
             InitDriverDelegateType();
@@ -157,7 +157,7 @@ namespace RaiTask.Common.Job
                 var jobKey = new JobKey(entity.JobName, entity.JobGroup);
                 if (await scheduler.CheckExists(jobKey))
                 {
-                   return  ResponseOutput.NotOk("任务已存在");
+                    return ResponseOutput.NotOk("任务已存在");
                 }
                 //http请求配置
                 var httpDir = new Dictionary<string, string>()
@@ -242,11 +242,11 @@ namespace RaiTask.Common.Job
                 if (isDelete)
                 {
                     await scheduler.DeleteJob(new JobKey(jobName, jobGroup));
-                    result=ResponseOutput.Ok("删除任务计划成功！");
+                    result = ResponseOutput.Ok("删除任务计划成功！");
                 }
                 else
                 {
-                    result=ResponseOutput.Ok("停止任务计划成功！");
+                    result = ResponseOutput.Ok("停止任务计划成功！");
                 }
 
             }
@@ -275,13 +275,13 @@ namespace RaiTask.Common.Job
                     var endTime = jobDetail.JobDataMap.GetString("EndAt");
                     if (!string.IsNullOrWhiteSpace(endTime) && DateTime.Parse(endTime) <= DateTime.Now)
                     {
-                        result=ResponseOutput.NotOk("Job的结束时间已过期！");
+                        result = ResponseOutput.NotOk("Job的结束时间已过期！");
                     }
                     else
                     {
                         //任务已经存在则暂停任务
                         await scheduler.ResumeJob(jobKey);
-                        result = ResponseOutput.Ok("恢复任务计划成功！");  
+                        result = ResponseOutput.Ok("恢复任务计划成功！");
                         //Log.Information(string.Format("任务“{0}”恢复运行", jobName));
                     }
                 }
@@ -395,16 +395,18 @@ namespace RaiTask.Common.Job
         /// 获取所有Job（详情信息 - 初始化页面调用）
         /// </summary>
         /// <returns></returns>
-        public async Task<List<JobInfoEntity>> GetAllJobAsync()
+        public async Task<IResponseOutput> GetAllJobAsync()
         {
             List<JobKey> jboKeyList = new List<JobKey>();
-            List<JobInfoEntity> jobInfoList = new List<JobInfoEntity>();
+            List<JobInfoEntity> jobInfoEntityList = new List<JobInfoEntity>();
             var groupNames = await scheduler.GetJobGroupNames();
             foreach (var groupName in groupNames.OrderBy(t => t))
             {
                 jboKeyList.AddRange(await scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(groupName)));
-                jobInfoList.Add(new JobInfoEntity() { GroupName = groupName });
+                jobInfoEntityList.Add(new JobInfoEntity() { GroupName = groupName });
             }
+
+            List<JobInfo> jobInfoList = new List<JobInfo>();
             foreach (var jobKey in jboKeyList.OrderBy(t => t.Name))
             {
                 var jobDetail = await scheduler.GetJobDetail(jobKey);
@@ -417,48 +419,49 @@ namespace RaiTask.Common.Job
                 else
                     interval = (triggers as CronTriggerImpl)?.CronExpressionString;
 
-                foreach (var jobInfo in jobInfoList)
+                // foreach (var jobInfo in jobInfoEntityList)
+                // {
+                // if (jobInfo.GroupName == jobKey.Group)
+                //{
+                //旧代码没有保存JobTypeEnum，所以None可以默认为Url。
+                var jobType = (JobTypeEnum)jobDetail.JobDataMap.GetLong(JobConstant.JobTypeEnum);
+                jobType = jobType == JobTypeEnum.None ? JobTypeEnum.Url : jobType;
+
+                var triggerAddress = string.Empty;
+                if (jobType == JobTypeEnum.Url)
+                    triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.REQUESTURL);
+                else if (jobType == JobTypeEnum.Emial)
+                    triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.MailTo);
+                else if (jobType == JobTypeEnum.Mqtt)
+                    triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.Topic);
+                else if (jobType == JobTypeEnum.RabbitMQ)
+                    triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.RabbitQueue);
+
+                //Constant.MailTo
+                jobInfoList.Add(new JobInfo()
                 {
-                    if (jobInfo.GroupName == jobKey.Group)
-                    {
-                        //旧代码没有保存JobTypeEnum，所以None可以默认为Url。
-                        var jobType = (JobTypeEnum)jobDetail.JobDataMap.GetLong(JobConstant.JobTypeEnum);
-                        jobType = jobType == JobTypeEnum.None ? JobTypeEnum.Url : jobType;
-
-                        var triggerAddress = string.Empty;
-                        if (jobType == JobTypeEnum.Url)
-                            triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.REQUESTURL);
-                        else if (jobType == JobTypeEnum.Emial)
-                            triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.MailTo);
-                        else if (jobType == JobTypeEnum.Mqtt)
-                            triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.Topic);
-                        else if (jobType == JobTypeEnum.RabbitMQ)
-                            triggerAddress = jobDetail.JobDataMap.GetString(JobConstant.RabbitQueue);
-
-                        //Constant.MailTo
-                        jobInfo.JobInfoList.Add(new JobInfo()
-                        {
-                            Name = jobKey.Name,
-                            LastErrMsg = jobDetail.JobDataMap.GetString(JobConstant.EXCEPTION),
-                            TriggerAddress = triggerAddress,
-                            TriggerState = await scheduler.GetTriggerState(triggers.Key),
-                            PreviousFireTime = triggers.GetPreviousFireTimeUtc()?.LocalDateTime,
-                            NextFireTime = triggers.GetNextFireTimeUtc()?.LocalDateTime,
-                            BeginTime = triggers.StartTimeUtc.LocalDateTime,
-                            Interval = interval,
-                            EndTime = triggers.EndTimeUtc?.LocalDateTime,
-                            Description = jobDetail.Description,
-                            RequestType = jobDetail.JobDataMap.GetString(JobConstant.REQUESTTYPE),
-                            RunNumber = jobDetail.JobDataMap.GetLong(JobConstant.RUNNUMBER),
-                            JobType = (long)jobType
-                            //(triggers as SimpleTriggerImpl)?.TimesTriggered
-                            //CronTriggerImpl 中没有 TimesTriggered 所以自己RUNNUMBER记录
-                        });
-                        continue;
-                    }
-                }
+                    Name = jobKey.Name,
+                    GroupName= jobKey.Group,
+                    LastErrMsg = jobDetail.JobDataMap.GetString(JobConstant.EXCEPTION),
+                    TriggerAddress = triggerAddress,
+                    TriggerState = await scheduler.GetTriggerState(triggers.Key),
+                    PreviousFireTime = triggers.GetPreviousFireTimeUtc()?.LocalDateTime,
+                    NextFireTime = triggers.GetNextFireTimeUtc()?.LocalDateTime,
+                    BeginTime = triggers.StartTimeUtc.LocalDateTime,
+                    Interval = interval,
+                    EndTime = triggers.EndTimeUtc?.LocalDateTime,
+                    Description = jobDetail.Description,
+                    RequestType = jobDetail.JobDataMap.GetString(JobConstant.REQUESTTYPE),
+                    RunNumber = jobDetail.JobDataMap.GetLong(JobConstant.RUNNUMBER),
+                    JobType = (long)jobType
+                    //(triggers as SimpleTriggerImpl)?.TimesTriggered
+                    //CronTriggerImpl 中没有 TimesTriggered 所以自己RUNNUMBER记录
+                });
+                continue;
+                //  }
+                //}
             }
-            return jobInfoList;
+            return  ResponseOutput.Ok(jobInfoList);
         }
 
         /// <summary>

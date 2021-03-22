@@ -86,7 +86,7 @@ namespace RaiTask.API.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [HttpPut("Menu")]
+        [HttpPut("Menu/{id}")]
         public async Task<IResponseOutput> UpdateMenu(PermissionUpdateMenuInput input)
         {
             return await _permissionServices.UpdateMenuAsync(input);
@@ -121,7 +121,7 @@ namespace RaiTask.API.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [HttpPut("Group")]
+        [HttpPut("Group/{id}")]
         public async Task<IResponseOutput> UpdateGroup(PermissionUpdateGroupInput input)
         {
             return await _permissionServices.UpdateGroupAsync(input);
@@ -158,7 +158,7 @@ namespace RaiTask.API.Controllers
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        [HttpPut("Api")]
+        [HttpPut("Api/{id}")]
         public async Task<IResponseOutput> UpdateApi(PermissionUpdateApiInput input)
         {
             return await _permissionServices.UpdateApiAsync(input);

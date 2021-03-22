@@ -25,7 +25,7 @@ namespace RaiTask.IServices
 
         Task<long> GetRunNumberAsync(JobKey jobKey);
 
-        Task<List<JobInfoEntity>> GetAllJobAsync();
+        Task<IResponseOutput> GetAllJobAsync();
 
         Task<bool> RemoveErrLog(string jobGroup, string jobName);
 

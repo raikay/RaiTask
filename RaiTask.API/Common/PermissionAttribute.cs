@@ -38,7 +38,7 @@ namespace RaiTask.API.Attributes
             var _userService = context.HttpContext.RequestServices.GetService<IUserService>();
             //获取用户权限
             var permissionList = await _userService.GetUserPermissionsAsync();
-            var isValid = permissionList.Any(m => m != null && m.Path.EqualsIgnoreCase($"/{api}")&&m.HttpMethod.EqualsIgnoreCase(httpMethod));
+            var isValid = permissionList.Any(m => m != null &&!string.IsNullOrWhiteSpace(m.HttpMethod) && m.Path.EqualsIgnoreCase($"/{api}")&&m.HttpMethod.EqualsIgnoreCase(httpMethod));
             if (!isValid)
             {
                 context.Result = new ForbidResult();

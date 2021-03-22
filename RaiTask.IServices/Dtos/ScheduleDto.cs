@@ -106,6 +106,10 @@ namespace RaiTask.IServices.Dtos
         /// 任务名称
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 任务组名
+        /// </summary>
+        public string GroupName { get; set; }
 
         /// <summary>
         /// 下次执行时间
