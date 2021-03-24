@@ -39,7 +39,7 @@ namespace RaiTask.API.Controllers
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        [HttpPost("AddJob")]
+        [HttpPost]
         public async Task<IResponseOutput> AddJob([FromBody] ScheduleDto entity)
         {
             return await _service.AddScheduleJobAsync(entity);
@@ -72,7 +72,7 @@ namespace RaiTask.API.Controllers
         /// 删除任务
         /// </summary> 
         /// <returns></returns>
-        [HttpPost("RemoveJob")]
+        [HttpDelete("del")]
         public async Task<IResponseOutput> RemoveJob([FromBody] JobKey job)
         {
             return await _service.StopOrDelScheduleJobAsync(job.Group, job.Name, true);
