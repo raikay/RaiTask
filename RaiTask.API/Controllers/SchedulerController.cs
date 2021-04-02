@@ -92,8 +92,8 @@ namespace RaiTask.API.Controllers
         /// 查询任务
         /// </summary>
         /// <returns></returns>
-        [HttpPost("QueryJob")]
-        public async Task<ScheduleDto> QueryJob([FromBody] JobKey job)
+        [HttpGet("QueryJob")]
+        public async Task<ScheduleDto> QueryJob([FromQuery]JobKey job)
         {
             return await _service.QueryJobAsync(job.Group, job.Name);
         }
