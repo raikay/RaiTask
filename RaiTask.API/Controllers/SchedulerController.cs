@@ -93,9 +93,9 @@ namespace RaiTask.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("QueryJob")]
-        public async Task<ScheduleDto> QueryJob([FromQuery]JobKey job)
+        public async Task<ScheduleDto> QueryJob([FromQuery]string group,string name)
         {
-            return await _service.QueryJobAsync(job.Group, job.Name);
+            return await _service.QueryJobAsync(group, name);
         }
 
         /// <summary>
