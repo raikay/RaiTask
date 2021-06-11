@@ -103,7 +103,7 @@ namespace RaiTask.API.Controllers
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        [HttpPost("ModifyJob")]
+        [HttpPut("ModifyJob")]
         public async Task<IResponseOutput> ModifyJob([FromBody] ModifyJobInput entity)
         {
 
